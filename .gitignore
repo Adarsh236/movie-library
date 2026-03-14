@@ -1,0 +1,42 @@
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# build output
+dist/
+build/
+coverage/
+
+# environment files
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# frontend
+client/dist/
+client/.vite/
+
+# backend
+server/dist/
+
+# TypeScript
+*.tsbuildinfo
+
+# test artifacts
+playwright-report/
+test-results/
+
+# misc
+.tmp/
+.temp/
