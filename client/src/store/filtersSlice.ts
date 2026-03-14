@@ -1,13 +1,15 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 
 interface FiltersState {
-  query: string
+  titleInput: string
+  title: string
   genre: string
   page: number
 }
 
 const initialState: FiltersState = {
-  query: '',
+  titleInput: '',
+  title: '',
   genre: '',
   page: 1,
 }
@@ -16,8 +18,18 @@ const filtersSlice = createSlice({
   name: 'filters',
   initialState,
   reducers: {
-    setQuery(state, action: PayloadAction<string>) {
-      state.query = action.payload
+    setTitleInput(state, action: PayloadAction<string>) {
+      state.titleInput = action.payload
+    },
+    applyTitleSearch(state, action: PayloadAction<string>) {
+      const normalizedTitle = action.payload.trim()
+      state.titleInput = action.payload
+      state.title = normalizedTitle
+      state.page = 1
+    },
+    clearTitleSearch(state) {
+      state.titleInput = ''
+      state.title = ''
       state.page = 1
     },
     setGenre(state, action: PayloadAction<string>) {
@@ -27,11 +39,10 @@ const filtersSlice = createSlice({
     setPage(state, action: PayloadAction<number>) {
       state.page = action.payload
     },
-    resetFilters() {
-      return initialState
-    },
   },
 })
 
-export const { setQuery, setGenre, setPage, resetFilters } = filtersSlice.actions
+export const { setTitleInput, applyTitleSearch, clearTitleSearch, setGenre, setPage } =
+  filtersSlice.actions
+
 export const filtersReducer = filtersSlice.reducer
