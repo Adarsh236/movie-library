@@ -1,0 +1,33 @@
+.page {
+  display: grid;
+  gap: 1rem;
+  width: min(100% - 2rem, 1280px);
+  margin: 0 auto;
+  padding: 1rem 0 2rem;
+}
+
+.sidebar {
+  order: 2;
+}
+
+.content {
+  order: 1;
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .page {
+    grid-template-columns: 280px minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .sidebar {
+    order: 1;
+    position: sticky;
+    top: 1rem;
+  }
+
+  .content {
+    order: 2;
+  }
+}
