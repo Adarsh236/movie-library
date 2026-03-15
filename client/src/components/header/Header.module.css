@@ -1,0 +1,151 @@
+.header {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--header-height);
+  width: min(100%, var(--layout-max-width));
+  min-width: 0;
+  margin-inline: auto;
+  padding: 0.75rem 1rem;
+}
+
+.start {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.menuButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0.0625rem solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: rgb(255 255 255 / 0.02);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 1.125rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.menuButton:hover {
+  border-color: rgb(255 255 255 / 0.12);
+  background: rgb(255 255 255 / 0.05);
+}
+
+.menuButton:active {
+  transform: translateY(0.0625rem);
+}
+
+.logo {
+  color: var(--color-primary);
+  font-family: var(--font-family-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.logo:hover {
+  color: var(--color-primary-strong);
+}
+
+.searchSlot {
+  grid-column: 1 / -1;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.end {
+  display: none;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.link,
+.activeLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: 0.625rem 0.875rem;
+  border: 0.0625rem solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  line-height: 1;
+  text-decoration: none;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.link:hover {
+  border-color: rgb(255 255 255 / 0.08);
+  background: rgb(255 255 255 / 0.04);
+}
+
+.activeLink {
+  border-color: rgb(242 179 0 / 0.22);
+  background: linear-gradient(180deg, rgb(242 179 0 / 0.16), rgb(242 179 0 / 0.06));
+  color: var(--color-primary-strong);
+}
+
+.link:active,
+.activeLink:active {
+  transform: translateY(0.0625rem);
+}
+
+.menuButton:focus-visible,
+.logo:focus-visible,
+.link:focus-visible,
+.activeLink:focus-visible {
+  outline: 0.125rem solid var(--color-primary);
+  outline-offset: 0.125rem;
+}
+
+@media (min-width: 48rem) {
+  .header {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: var(--space-4);
+    padding: 0.875rem 1.5rem;
+  }
+
+  .searchSlot {
+    grid-column: auto;
+  }
+
+  .end {
+    display: inline-flex;
+  }
+}
+
+@media (min-width: 64rem) {
+  .header {
+    padding: 1rem 1.5rem;
+  }
+
+  .menuButton {
+    display: none;
+  }
+
+  .logo {
+    font-size: 1.625rem;
+  }
+}
