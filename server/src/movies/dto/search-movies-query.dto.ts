@@ -1,13 +1,17 @@
-import { Transform } from 'class-transformer'
-import { IsInt, IsString, Max, Min, MinLength } from 'class-validator'
+import { Transform, Type } from 'class-transformer'
+import { IsInt, IsString, Matches, Max, MaxLength, Min, MinLength } from 'class-validator'
 
 export class SearchMoviesQueryDto {
+  @Transform(({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
-  @Transform(({ value }) => String(value ?? '').trim())
   @MinLength(1)
+  @MaxLength(100)
+  @Matches(/^[^\p{Cc}]+$/u, {
+    message: 'title contains invalid control characters',
+  })
   title!: string
 
-  @Transform(({ value }) => Number(value ?? 1))
+  @Type(() => Number)
   @IsInt()
   @Min(1)
   @Max(500)
