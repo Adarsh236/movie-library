@@ -13,7 +13,8 @@
 html,
 body,
 #root {
-  min-height: 100%;
+  width: 100%;
+  overflow-x: clip;
 }
 
 body {
@@ -44,11 +45,6 @@ html {
 }
 
 body {
-  background-image:
-    radial-gradient(ellipse at top left, var(--color-bg-glow-top-left), transparent 95%),
-    radial-gradient(ellipse at top right, var(--color-glow-top-right), transparent 95%),
-    radial-gradient(ellipse at bottom right, var(--color-glow-bottom-right), transparent 95%),
-    radial-gradient(ellipse at bottom left, var(--color-glow-bottom-left), transparent 95%);
   background-color: var(--color-bg);
 
   color: var(--color-text);

@@ -1,14 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query'
 import { baseApi } from '../services/baseApi'
-import { filtersReducer } from './filtersSlice'
 import { asyncFetchTimeMiddleware } from './asyncFetchTimeMiddleware'
 import { useDispatch, type TypedUseSelectorHook, useSelector } from 'react-redux'
 
 export const store = configureStore({
   reducer: {
     [baseApi.reducerPath]: baseApi.reducer,
-    filters: filtersReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
