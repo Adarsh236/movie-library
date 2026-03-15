@@ -1,0 +1,42 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+}
+
+.spinner {
+  display: inline-block;
+  border: 0.125rem solid rgb(255 255 255 / 0.12);
+  border-top-color: var(--color-primary);
+  border-radius: 999rem;
+  animation: spin 0.8s linear infinite;
+  flex: 0 0 auto;
+}
+
+.sm {
+  width: 1rem;
+  height: 1rem;
+}
+
+.md {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.lg {
+  width: 2rem;
+  height: 2rem;
+}
+
+.label {
+  color: inherit;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
