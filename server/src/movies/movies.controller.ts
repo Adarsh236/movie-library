@@ -2,8 +2,8 @@ import { Controller, Get, Param, Query } from '@nestjs/common'
 
 import { SearchMoviesQueryDto } from './dto/search-movies-query.dto'
 import { MoviesService } from './movies.service'
-import { PageQueryDto } from 'src/movies/dto/page-query.dto'
-import { GenreParamDto } from 'src/movies/dto/genre-param.dto'
+import { PageQueryDto } from './dto/page-query.dto'
+import { GenreParamDto } from './dto/genre-param.dto'
 
 @Controller('movies')
 export class MoviesController {
