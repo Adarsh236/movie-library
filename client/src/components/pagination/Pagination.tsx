@@ -1,32 +1,48 @@
-import { Button } from '../button/Button'
-import { SectionCard } from '../section-card/SectionCard'
 import styles from './Pagination.module.css'
 
 type PaginationProps = {
-  page: number
+  currentPage: number
   totalPages: number
-  onPrevious: () => void
-  onNext: () => void
+  onPageChange: (page: number) => void
 }
 
-export function Pagination({ page, totalPages, onPrevious, onNext }: PaginationProps) {
+function clampPage(page: number, totalPages: number): number {
+  if (page < 1) return 1
+  if (page > totalPages) return totalPages
+  return page
+}
+
+export function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
   if (totalPages <= 1) {
     return null
   }
 
+  const previousPage = clampPage(currentPage - 1, totalPages)
+  const nextPage = clampPage(currentPage + 1, totalPages)
+
   return (
-    <SectionCard as='nav' className={styles.pagination} aria-label='Movies pagination'>
-      <Button variant='secondary' onClick={onPrevious} disabled={page <= 1}>
+    <nav className={styles.pagination} aria-label='Pagination'>
+      <button
+        type='button'
+        className={styles.button}
+        disabled={currentPage <= 1}
+        onClick={() => onPageChange(previousPage)}
+      >
         Previous
-      </Button>
+      </button>
 
-      <span className={styles.label}>
-        Page {page} of {totalPages}
-      </span>
+      <p className={styles.status}>
+        Page <span>{currentPage}</span> of <span>{totalPages}</span>
+      </p>
 
-      <Button variant='secondary' onClick={onNext} disabled={page >= totalPages}>
+      <button
+        type='button'
+        className={styles.button}
+        disabled={currentPage >= totalPages}
+        onClick={() => onPageChange(nextPage)}
+      >
         Next
-      </Button>
-    </SectionCard>
+      </button>
+    </nav>
   )
 }
