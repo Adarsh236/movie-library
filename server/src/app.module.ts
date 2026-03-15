@@ -1,10 +1,17 @@
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { Module } from '@nestjs/common'
+import { ConfigModule } from '@nestjs/config'
+import { envSchema } from './config/env.schema'
+import { MoviesModule } from './movies/movies.module'
+import { TmdbModule } from './tmdb/tmdb.module'
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validate: (config) => envSchema.parse(config),
+    }),
+    TmdbModule,
+    MoviesModule,
+  ],
 })
 export class AppModule {}
