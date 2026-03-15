@@ -1,18 +1,26 @@
-import { Button } from '../../../components/button/Button'
+import clsx from 'clsx'
 import { SectionCard } from '../../../components/section-card/SectionCard'
 import styles from './RecentSearchesSidebar.module.css'
+import baseStyles from '../../../styles/baseStyles.module.css'
+import { Button } from '../../../components/button/Button'
 
 type RecentSearchesSidebarProps = {
   items: string[]
+  activeValue?: string
   onSelect: (value: string) => void
   onClear: () => void
 }
 
-export function RecentSearchesSidebar({ items, onSelect, onClear }: RecentSearchesSidebarProps) {
+export function RecentSearchesSidebar({
+  items,
+  activeValue = '',
+  onSelect,
+  onClear,
+}: RecentSearchesSidebarProps) {
   return (
     <SectionCard as='aside' className={styles.panel}>
       <div className={styles.header}>
-        <h2 className={styles.title}>Recent Searches</h2>
+        <h2 className={styles.title}>Recent</h2>
 
         {items.length > 0 ? (
           <Button variant='ghost' onClick={onClear}>
@@ -24,15 +32,22 @@ export function RecentSearchesSidebar({ items, onSelect, onClear }: RecentSearch
       {items.length === 0 ? (
         <p className={styles.empty}>No recent searches yet.</p>
       ) : (
-        <ul className={styles.list}>
-          {items.map((item) => (
-            <li key={item}>
-              <Button variant='ghost' className={styles.itemButton} onClick={() => onSelect(item)}>
-                {item}
-              </Button>
-            </li>
+        <div className={styles.list}>
+          {items.map((item, index) => (
+            <button
+              key={`${item}-${index}`}
+              type='button'
+              className={clsx(
+                baseStyles.wordBreak,
+                styles.itemButton,
+                activeValue.trim().toLowerCase() === item.trim().toLowerCase() && styles.active,
+              )}
+              onClick={() => onSelect(item)}
+            >
+              {item}
+            </button>
           ))}
-        </ul>
+        </div>
       )}
     </SectionCard>
   )

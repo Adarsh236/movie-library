@@ -1,0 +1,9 @@
+.wordBreak {
+  width: 100%;
+  min-width: 0;
+  display: block;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  text-align: left;
+}

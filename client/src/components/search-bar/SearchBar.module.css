@@ -1,0 +1,57 @@
+.form,
+.container {
+  width: 100%;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.icon {
+  position: absolute;
+  left: 0.75rem;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  pointer-events: none;
+}
+
+.input {
+  width: 100%;
+  min-height: 2.5rem;
+  padding-inline: 2.5rem;
+  border: 1px solid rgb(255 255 255 / 0.08);
+  border-radius: var(--radius-sm);
+  background: rgb(17 17 17 / 0.95);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+}
+
+.input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.clearButton {
+  position: absolute;
+  right: 0.5rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+@media (max-width: 40rem) {
+  .input {
+    min-height: 2.375rem;
+    padding: 0.55rem 2.125rem 0.55rem 1.9rem;
+    font-size: var(--font-size-xs);
+  }
+
+  .icon {
+    left: 0.625rem;
+  }
+}
