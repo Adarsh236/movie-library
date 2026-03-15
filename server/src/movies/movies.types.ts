@@ -16,7 +16,7 @@ export interface MoviesResponseDto {
   totalPages: number
 }
 
-export interface GenreItemDto {
+export interface GenreResponseDto {
   id: string
   label: string
 }

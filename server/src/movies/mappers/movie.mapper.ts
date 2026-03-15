@@ -1,5 +1,5 @@
 import type { TmdbGenre, TmdbMovie } from '../../tmdb/tmdb.types'
-import type { GenreItemDto, MovieItemDto } from '../movies.types'
+import type { GenreResponseDto, MovieItemDto } from '../movies.types'
 
 function toReleaseYear(releaseDate?: string): string {
   if (!releaseDate) return 'Unknown'
@@ -46,7 +46,7 @@ export function mapMovieItem(movie: TmdbMovie, genreMap: Map<number, string>): M
   }
 }
 
-export function mapGenres(genres: TmdbGenre[]): GenreItemDto[] {
+export function mapGenres(genres: TmdbGenre[]): GenreResponseDto[] {
   return genres.map((genre) => ({
     id: String(genre.id),
     label: genre.name,
