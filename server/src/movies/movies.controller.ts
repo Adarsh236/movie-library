@@ -1,15 +1,16 @@
-import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common'
-import { GetMoviesByGenreQueryDto } from './dto/get-movies-by-genre-query.dto'
-import { GetMoviesQueryDto } from './dto/get-movies-query.dto'
+import { Controller, Get, Param, Query } from '@nestjs/common'
+
 import { SearchMoviesQueryDto } from './dto/search-movies-query.dto'
 import { MoviesService } from './movies.service'
+import { PageQueryDto } from 'src/movies/dto/page-query.dto'
+import { GenreParamDto } from 'src/movies/dto/genre-param.dto'
 
 @Controller('movies')
 export class MoviesController {
   constructor(private readonly moviesService: MoviesService) {}
 
   @Get()
-  getMovies(@Query() query: GetMoviesQueryDto) {
+  getMovies(@Query() query: PageQueryDto) {
     return this.moviesService.getMovies(query)
   }
 
@@ -19,10 +20,7 @@ export class MoviesController {
   }
 
   @Get('genre/:genreId')
-  getMoviesByGenre(
-    @Param('genreId', ParseIntPipe) genreId: number,
-    @Query() query: GetMoviesByGenreQueryDto,
-  ) {
-    return this.moviesService.getMoviesByGenre(genreId, query)
+  getMoviesByGenre(@Param() params: GenreParamDto, @Query() query: PageQueryDto) {
+    return this.moviesService.getMoviesByGenre(params.genreId, query)
   }
 }

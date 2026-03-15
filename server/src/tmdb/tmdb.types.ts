@@ -1,3 +1,6 @@
+import z from 'zod'
+import { tmdbGenresResponseSchema, tmdbMoviesResponseSchema } from './tmdb.schemas'
+
 export interface TmdbGenre {
   id: number
   name: string
@@ -13,13 +16,5 @@ export interface TmdbMovie {
   overview?: string
 }
 
-export interface TmdbMoviesResponse {
-  page: number
-  total_pages: number
-  total_results: number
-  results: TmdbMovie[]
-}
-
-export interface TmdbGenresResponse {
-  genres: TmdbGenre[]
-}
+export type TmdbGenresResponse = z.infer<typeof tmdbGenresResponseSchema>
+export type TmdbMoviesResponse = z.infer<typeof tmdbMoviesResponseSchema>

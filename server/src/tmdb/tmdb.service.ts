@@ -1,8 +1,10 @@
 import { HttpService } from '@nestjs/axios'
 import { BadGatewayException, Injectable, InternalServerErrorException } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
-import type { TmdbGenresResponse, TmdbMoviesResponse } from './tmdb.types'
+import { tmdbGenresResponseSchema, tmdbMoviesResponseSchema } from './tmdb.schemas'
+import { ConfigService } from '@nestjs/config'
+import z from 'zod'
+import { TmdbGenresResponse, TmdbMoviesResponse } from './tmdb.types'
 
 @Injectable()
 export class TmdbService {
@@ -21,89 +23,95 @@ export class TmdbService {
     return token
   }
 
-  private get headers() {
+  private get headers(): Record<string, string> {
     return {
       Authorization: `Bearer ${this.accessToken}`,
     }
   }
 
-  async discoverMovies(page: number): Promise<TmdbMoviesResponse> {
+  private async getAndValidate<T>(
+    url: string,
+    schema: z.ZodSchema<T>,
+    params: Record<string, string | number | boolean>,
+    errorMessage: string,
+  ): Promise<T> {
     try {
       const response = await firstValueFrom(
-        this.httpService.get<TmdbMoviesResponse>('/discover/movie', {
+        this.httpService.get(url, {
           headers: this.headers,
-          params: {
-            language: 'en-US',
-            page,
-            include_adult: false,
-            include_video: false,
-            sort_by: 'popularity.desc',
-          },
+          params,
         }),
       )
 
-      return response.data
-    } catch {
-      throw new BadGatewayException('Failed to fetch movies from TMDB.')
+      const parsed = schema.safeParse(response.data)
+
+      if (!parsed.success) {
+        throw new BadGatewayException(`TMDB returned an invalid payload for ${url}.`)
+      }
+
+      return parsed.data
+    } catch (error) {
+      if (error instanceof BadGatewayException) {
+        throw error
+      }
+
+      throw new BadGatewayException(errorMessage)
     }
+  }
+
+  async discoverMovies(page: number): Promise<TmdbMoviesResponse> {
+    return this.getAndValidate(
+      '/discover/movie',
+      tmdbMoviesResponseSchema,
+      {
+        language: 'en-US',
+        page,
+        include_adult: false,
+        include_video: false,
+        sort_by: 'popularity.desc',
+      },
+      'Failed to fetch movies from TMDB.',
+    )
   }
 
   async discoverMoviesByGenre(genreId: number, page: number): Promise<TmdbMoviesResponse> {
-    try {
-      const response = await firstValueFrom(
-        this.httpService.get<TmdbMoviesResponse>('/discover/movie', {
-          headers: this.headers,
-          params: {
-            language: 'en-US',
-            page,
-            include_adult: false,
-            include_video: false,
-            sort_by: 'popularity.desc',
-            with_genres: genreId,
-          },
-        }),
-      )
-
-      return response.data
-    } catch {
-      throw new BadGatewayException('Failed to fetch movies by genre from TMDB.')
-    }
+    return this.getAndValidate(
+      '/discover/movie',
+      tmdbMoviesResponseSchema,
+      {
+        language: 'en-US',
+        page,
+        include_adult: false,
+        include_video: false,
+        sort_by: 'popularity.desc',
+        with_genres: genreId,
+      },
+      'Failed to fetch movies by genre from TMDB.',
+    )
   }
 
   async searchMoviesByTitle(title: string, page: number): Promise<TmdbMoviesResponse> {
-    try {
-      const response = await firstValueFrom(
-        this.httpService.get<TmdbMoviesResponse>('/search/movie', {
-          headers: this.headers,
-          params: {
-            query: title,
-            page,
-            include_adult: false,
-            language: 'en-US',
-          },
-        }),
-      )
-
-      return response.data
-    } catch {
-      throw new BadGatewayException('Failed to search movies from TMDB.')
-    }
+    return this.getAndValidate(
+      '/search/movie',
+      tmdbMoviesResponseSchema,
+      {
+        query: title,
+        page,
+        include_adult: false,
+        language: 'en-US',
+      },
+      'Failed to search movies from TMDB.',
+    )
   }
 
   async getGenres(): Promise<TmdbGenresResponse> {
-    try {
-      const response = await firstValueFrom(
-        this.httpService.get<TmdbGenresResponse>('/genre/movie/list', {
-          headers: this.headers,
-          params: {
-            language: 'en-US',
-          },
-        }),
-      )
-
-      return response.data
-    } catch {
-      throw new BadGatewayException('Failed to fetch genres from TMDB.')
-    }
+    return this.getAndValidate(
+      '/genre/movie/list',
+      tmdbGenresResponseSchema,
+      {
+        language: 'en-US',
+      },
+      'Failed to fetch genres from TMDB.',
+    )
   }
 }

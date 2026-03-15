@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common'
 import { TmdbService } from '../tmdb/tmdb.service'
-import { GetMoviesByGenreQueryDto } from './dto/get-movies-by-genre-query.dto'
-import { GetMoviesQueryDto } from './dto/get-movies-query.dto'
+
 import { SearchMoviesQueryDto } from './dto/search-movies-query.dto'
 import { buildGenreMap, mapGenres, mapMovieItem } from './mappers/movie.mapper'
 import type { GenreItemDto, MoviesResponseDto } from './movies.types'
+import { PageQueryDto } from 'src/movies/dto/page-query.dto'
 
 @Injectable()
 export class MoviesService {
   constructor(private readonly tmdbService: TmdbService) {}
 
-  async getMovies(query: GetMoviesQueryDto): Promise<MoviesResponseDto> {
+  async getMovies(query: PageQueryDto): Promise<MoviesResponseDto> {
     const genresResponse = await this.tmdbService.getGenres()
     const genreMap = buildGenreMap(genresResponse.genres ?? [])
 
@@ -38,10 +38,7 @@ export class MoviesService {
     }
   }
 
-  async getMoviesByGenre(
-    genreId: number,
-    query: GetMoviesByGenreQueryDto,
-  ): Promise<MoviesResponseDto> {
+  async getMoviesByGenre(genreId: number, query: PageQueryDto): Promise<MoviesResponseDto> {
     const genresResponse = await this.tmdbService.getGenres()
     const genreMap = buildGenreMap(genresResponse.genres ?? [])
 
