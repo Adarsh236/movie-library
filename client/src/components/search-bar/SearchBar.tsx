@@ -1,71 +1,67 @@
-import { useCallback, type ChangeEvent, type FormEvent, type KeyboardEvent } from 'react'
+import { type FormEvent } from 'react'
+import clsx from 'clsx'
+import { Button } from '../button/Button'
 import styles from './SearchBar.module.css'
 
-interface SearchBarProps {
+type SearchBarProps = {
+  id?: string
   value: string
-  compact?: boolean
-  onChange: (query: string) => void
-  onClear: () => void
-  onSubmit?: () => void
+  placeholder?: string
+  className?: string
+  isBusy?: boolean
+  onChange: (value: string) => void
+  onSubmit: (value: string) => void
+  onClear?: () => void
 }
 
-export function SearchBar({ value, compact = false, onChange, onClear, onSubmit }: SearchBarProps) {
-  const handleChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      onChange(event.target.value)
-    },
-    [onChange],
-  )
+export function SearchBar({
+  id = 'movie-search',
+  value,
+  placeholder = 'Search movies',
+  className,
+  isBusy = false,
+  onChange,
+  onSubmit,
+  onClear,
+}: SearchBarProps) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    onSubmit(value)
+  }
 
-  const handleSubmit = useCallback(
-    (event: FormEvent<HTMLFormElement>) => {
-      event.preventDefault()
-      onSubmit?.()
-    },
-    [onSubmit],
-  )
-
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent<HTMLInputElement>) => {
-      if (event.key === 'Escape') {
-        onClear()
-      }
-    },
-    [onClear],
-  )
+  const hasValue = value.trim().length > 0
 
   return (
-    <form
-      className={`${styles.container} ${compact ? styles.compact : styles.full}`}
-      onSubmit={handleSubmit}
-      role='search'
-      aria-label='Search movies'
-    >
-      <div className={styles.inputWrapper}>
-        <span className={styles.icon} aria-hidden='true'>
-          ⌕
-        </span>
+    <form className={clsx(styles.form, className)} onSubmit={handleSubmit} role='search'>
+      <label htmlFor={id} className={styles.srOnly}>
+        Search movies by title
+      </label>
 
+      <div className={styles.field}>
         <input
-          type='text'
-          className={styles.input}
-          placeholder='Search by title…'
-          value={value}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          aria-label='Search movies'
+          id={id}
+          name='title'
+          type='search'
           autoComplete='off'
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          placeholder={placeholder}
+          className={styles.input}
+          aria-busy={isBusy}
         />
 
-        {value ? (
-          <button
+        {hasValue ? (
+          <Button
             type='button'
+            variant='ghost'
+            size='sm'
             className={styles.clearButton}
             onClick={onClear}
             aria-label='Clear search'
+            title='Clear search'
           >
-            ✕
-          </button>
+            X
+          </Button>
         ) : null}
       </div>
     </form>
