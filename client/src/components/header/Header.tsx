@@ -15,7 +15,7 @@ type SearchDraftState = {
   value: string
 }
 
-const SEARCH_DEBOUNCE_MS = 400
+const SEARCH_DEBOUNCE_MS = 700
 const MIN_SEARCH_LENGTH = 3
 
 function normalizeSearchValue(value: string): string {
@@ -42,6 +42,30 @@ export function Header({ onOpenSidebar }: HeaderProps) {
   const searchValue = draftState.routeKey === routeKey ? draftState.value : routeInputValue
   const debouncedSearchValue = useDebouncedValue(searchValue, SEARCH_DEBOUNCE_MS)
 
+  function commitSearch(rawValue: string, options?: { replace?: boolean }): void {
+    const normalizedValue = normalizeSearchValue(rawValue)
+
+    setDraftState({
+      routeKey,
+      value: normalizedValue,
+    })
+
+    if (!normalizedValue) {
+      void navigate('/', { replace: true })
+      return
+    }
+
+    if (normalizedValue.length < MIN_SEARCH_LENGTH) {
+      return
+    }
+
+    addSearch(normalizedValue)
+
+    void navigate(buildSearchUrl(normalizedValue), {
+      replace: options?.replace ?? location.pathname === '/search',
+    })
+  }
+
   useEffect(() => {
     const normalizedCurrentValue = normalizeSearchValue(searchValue)
     const normalizedDebouncedValue = normalizeSearchValue(debouncedSearchValue)
@@ -66,10 +90,12 @@ export function Header({ onOpenSidebar }: HeaderProps) {
       return
     }
 
+    addSearch(normalizedDebouncedValue)
+
     void navigate(buildSearchUrl(normalizedDebouncedValue), {
       replace: location.pathname === '/search',
     })
-  }, [debouncedSearchValue, location.pathname, navigate, routeTitle, searchValue])
+  }, [addSearch, debouncedSearchValue, location.pathname, navigate, routeTitle, searchValue])
 
   function handleChange(nextValue: string): void {
     setDraftState({
@@ -79,24 +105,7 @@ export function Header({ onOpenSidebar }: HeaderProps) {
   }
 
   function handleSubmit(value: string): void {
-    const normalizedValue = normalizeSearchValue(value)
-
-    setDraftState({
-      routeKey,
-      value: normalizedValue,
-    })
-
-    if (!normalizedValue) {
-      void navigate('/')
-      return
-    }
-
-    if (normalizedValue.length < MIN_SEARCH_LENGTH) {
-      return
-    }
-
-    addSearch(normalizedValue)
-    void navigate(buildSearchUrl(normalizedValue))
+    commitSearch(value)
   }
 
   function handleClear(): void {
