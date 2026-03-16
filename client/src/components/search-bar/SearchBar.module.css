@@ -62,6 +62,7 @@
 
 .clearButton {
   position: absolute;
+  color: white;
   top: 50%;
   right: 0.375rem;
   transform: translateY(-50%);

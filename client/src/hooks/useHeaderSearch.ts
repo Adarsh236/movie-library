@@ -16,6 +16,12 @@ type UseHeaderSearchResult = {
   handleClear: () => void
 }
 
+type SearchDraftState = {
+  routeKey: string
+  value: string
+  hasPendingUserInput: boolean
+}
+
 function normalizeSearchValue(value: string): string {
   return value.trim()
 }
@@ -32,38 +38,40 @@ export function useHeaderSearch(options: UseHeaderSearchOptions = {}): UseHeader
     location.pathname === '/search' ? parseTitleParam(searchParams.get('title')) : ''
 
   const routeInputValue = location.pathname === '/search' ? routeTitle : ''
+  const routeKey = `${location.pathname}?title=${routeTitle}`
 
-  const [searchValue, setSearchValue] = useState(routeInputValue)
-  const [hasPendingUserInput, setHasPendingUserInput] = useState(false)
+  const [draftState, setDraftState] = useState<SearchDraftState>(() => ({
+    routeKey,
+    value: routeInputValue,
+    hasPendingUserInput: false,
+  }))
 
+  const activeDraft =
+    draftState.routeKey === routeKey
+      ? draftState
+      : {
+          routeKey,
+          value: routeInputValue,
+          hasPendingUserInput: false,
+        }
+
+  const searchValue = activeDraft.value
+  const hasPendingUserInput = activeDraft.hasPendingUserInput
   const debouncedSearchValue = useDebouncedValue(searchValue, debounceMs)
 
   useEffect(() => {
-    setSearchValue(routeInputValue)
-    setHasPendingUserInput(false)
-  }, [routeInputValue, location.pathname, location.search])
+    const normalizedRouteTitle = normalizeSearchValue(routeTitle)
 
-  function commitSearch(rawValue: string, options?: { replace?: boolean }): void {
-    const normalizedValue = normalizeSearchValue(rawValue)
-
-    setSearchValue(normalizedValue)
-    setHasPendingUserInput(false)
-
-    if (!normalizedValue) {
-      void navigate('/', { replace: true })
+    if (location.pathname !== '/search') {
       return
     }
 
-    if (normalizedValue.length < minSearchLength) {
+    if (normalizedRouteTitle.length < minSearchLength) {
       return
     }
 
-    addSearch(normalizedValue)
-
-    void navigate(buildSearchUrl(normalizedValue), {
-      replace: options?.replace ?? location.pathname === '/search',
-    })
-  }
+    addSearch(normalizedRouteTitle)
+  }, [addSearch, location.pathname, minSearchLength, routeTitle])
 
   useEffect(() => {
     if (!hasPendingUserInput) {
@@ -109,17 +117,45 @@ export function useHeaderSearch(options: UseHeaderSearchOptions = {}): UseHeader
   ])
 
   function handleChange(nextValue: string): void {
-    setSearchValue(nextValue)
-    setHasPendingUserInput(true)
+    setDraftState({
+      routeKey,
+      value: nextValue,
+      hasPendingUserInput: true,
+    })
   }
 
   function handleSubmit(value: string): void {
-    commitSearch(value)
+    const normalizedValue = normalizeSearchValue(value)
+
+    setDraftState({
+      routeKey,
+      value: normalizedValue,
+      hasPendingUserInput: false,
+    })
+
+    if (!normalizedValue) {
+      void navigate('/', { replace: true })
+      return
+    }
+
+    if (normalizedValue.length < minSearchLength) {
+      return
+    }
+
+    addSearch(normalizedValue)
+
+    void navigate(buildSearchUrl(normalizedValue), {
+      replace: location.pathname === '/search',
+    })
   }
 
   function handleClear(): void {
-    setSearchValue('')
-    setHasPendingUserInput(false)
+    setDraftState({
+      routeKey,
+      value: '',
+      hasPendingUserInput: false,
+    })
+
     void navigate('/', { replace: true })
   }
 

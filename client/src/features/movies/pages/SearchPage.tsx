@@ -13,7 +13,6 @@ export function SearchPage() {
 
   const title = parseTitleParam(searchParams.get('title'))
   const page = parsePageParam(searchParams.get('page'))
-
   const isValidSearch = title.length >= MIN_SEARCH_LENGTH
 
   const query = useSearchMoviesQuery(isValidSearch ? { title, page } : skipToken)

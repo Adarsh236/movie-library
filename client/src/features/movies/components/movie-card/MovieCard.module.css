@@ -10,7 +10,7 @@
   aspect-ratio: 2 / 3;
   overflow: hidden;
   border-radius: 1rem;
-  background: var(--color-surface, #111);
+  background: var(--color-surface);
   box-shadow: 0 10px 24px rgb(0 0 0 / 0.18);
   transition:
     transform 180ms ease,
@@ -23,7 +23,7 @@
 .card:focus-within .posterFrame {
   transform: translateY(-4px);
   box-shadow: 0 16px 32px rgb(0 0 0 / 0.28);
-  border-color: var(--color-primary, #7c5cff);
+  border-color: var(--color-primary);
 }
 
 .poster {
@@ -67,7 +67,7 @@
   z-index: 2;
   padding: 0.4rem 0.6rem;
   border-radius: 999px;
-  background: var(--color-primary, #7c5cff);
+  background: var(--color-primary);
   color: #fff;
   font-size: 0.75rem;
   font-weight: 700;
@@ -137,6 +137,6 @@
 
 .card:hover .genreTag,
 .card:focus-within .genreTag {
-  background: var(--color-primary, #7c5cff);
-  border-color: var(--color-primary, #7c5cff);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
 }
