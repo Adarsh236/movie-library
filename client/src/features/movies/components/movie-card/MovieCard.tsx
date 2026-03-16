@@ -1,15 +1,15 @@
-import { useMemo, useState } from 'react'
-import styles from './MovieCard.module.css'
+import { useState } from 'react'
+import clsx from 'clsx'
 import type { Movie } from '../../../../types/types'
+import fallbackPoster from '../../../../assets/fall-back-poster.png'
+import styles from './MovieCard.module.css'
 
 type MovieCardProps = {
   movie: Movie
 }
 
-const FALLBACK_POSTER = 'https://placehold.co/400'
-
 function formatRating(value: number): string {
-  if (!Number.isFinite(value)) {
+  if (!Number.isFinite(value) || value === 0) {
     return 'N/A'
   }
 
@@ -17,46 +17,57 @@ function formatRating(value: number): string {
 }
 
 export function MovieCard({ movie }: MovieCardProps) {
-  const [hasImageError, setHasImageError] = useState(false)
+  const [failedPosterUrl, setFailedPosterUrl] = useState<string | null>(null)
 
-  const posterSrc = useMemo(() => {
-    if (hasImageError || !movie.posterUrl) {
-      return FALLBACK_POSTER
-    }
+  const shouldUseFallback = !movie.posterUrl || failedPosterUrl === movie.posterUrl
+  const posterSrc = shouldUseFallback ? fallbackPoster : (movie.posterUrl as string)
 
-    return movie.posterUrl
-  }, [hasImageError, movie.posterUrl])
+  const visibleGenres = movie.genres.slice(0, 2)
+  const remainingGenresCount = Math.max(movie.genres.length - visibleGenres.length, 0)
 
   return (
     <article className={styles.card}>
       <div className={styles.posterFrame}>
         <img
+          key={posterSrc}
           src={posterSrc}
           alt={`${movie.title} poster`}
-          className={styles.poster}
+          className={clsx(styles.poster, shouldUseFallback && styles.posterFallback)}
           loading='lazy'
-          onError={() => setHasImageError(true)}
+          onError={() => {
+            if (movie.posterUrl) {
+              setFailedPosterUrl(movie.posterUrl)
+            }
+          }}
         />
+
         <div className={styles.ratingBadge} aria-label={`Rating ${formatRating(movie.rating)}`}>
           {formatRating(movie.rating)}
         </div>
-      </div>
 
-      <div className={styles.body}>
-        <header className={styles.header}>
-          <h2 className={styles.title} title={movie.title}>
-            {movie.title}
-          </h2>
-          <p className={styles.releaseDate}>{movie.releaseDateLabel}</p>
-        </header>
+        <div className={styles.overlay}>
+          <header className={styles.header}>
+            <h2 className={styles.title} title={movie.title}>
+              {movie.title}
+            </h2>
 
-        <ul className={styles.genreList} aria-label='Genres'>
-          {movie.genres.slice(0, 3).map((genre) => (
-            <li key={genre} className={styles.genreTag}>
-              {genre}
-            </li>
-          ))}
-        </ul>
+            <p className={styles.releaseDate}>{movie.releaseDateLabel}</p>
+          </header>
+
+          <ul className={styles.genreList} aria-label='Genres'>
+            {visibleGenres.map((genre) => (
+              <li key={genre} className={styles.genreTag}>
+                {genre}
+              </li>
+            ))}
+
+            {remainingGenresCount > 0 ? (
+              <li className={styles.genreTag} aria-label={`${remainingGenresCount} more genres`}>
+                + {remainingGenresCount}
+              </li>
+            ) : null}
+          </ul>
+        </div>
       </div>
     </article>
   )

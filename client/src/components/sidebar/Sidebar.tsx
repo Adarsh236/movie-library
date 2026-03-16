@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useSearchParams } from 'react-router-dom'
 import { useGetGenresQuery } from '../../features/movies/api/moviesApi'
 import {
   buildGenreUrl,
@@ -7,12 +7,15 @@ import {
 } from '../../features/movies/lib/movieRouteState'
 import { useRecentSearches } from '../../hooks/useRecentSearches'
 import styles from './Sidebar.module.css'
+import clsx from 'clsx'
 
 type SidebarProps = {
   onNavigate?: () => void
 }
 
 export function Sidebar({ onNavigate }: SidebarProps) {
+  const [searchParams] = useSearchParams()
+  const title = searchParams.get('title')
   const { data: genres = [], isLoading, isError } = useGetGenresQuery()
   const { items: recentSearches, clearSearches } = useRecentSearches()
 
@@ -38,7 +41,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
                 key={item}
                 to={buildSearchUrl(item)}
                 onClick={onNavigate}
-                className={({ isActive }) => (isActive ? styles.activeLink : styles.link)}
+                className={clsx(title === item ? styles.activeLink : styles.link)}
               >
                 {item}
               </NavLink>

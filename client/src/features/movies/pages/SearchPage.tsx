@@ -2,9 +2,10 @@ import { skipToken } from '@reduxjs/toolkit/query'
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { useSearchMoviesQuery } from '../api/moviesApi'
 import { buildSearchUrl, parsePageParam, parseTitleParam } from '../lib/movieRouteState'
+import { EmptyState } from '../../../components/empty-state/EmptyState'
 import { PageContent } from '../components/page-content/PageContent'
 
-const MIN_SEARCH_LENGTH = 2
+const MIN_SEARCH_LENGTH = 3
 
 export function SearchPage() {
   const navigate = useNavigate()
@@ -32,7 +33,12 @@ export function SearchPage() {
       onPageChange={(nextPage) => {
         void navigate(buildSearchUrl(title, nextPage))
       }}
-      emptyState={<p>No matches found for "{title}".</p>}
+      emptyState={
+        <EmptyState
+          title={`No results for "${title}"`}
+          description='Try a different search term.'
+        />
+      }
     />
   )
 }

@@ -1,121 +1,14 @@
-import { useEffect, useState } from 'react'
-import { NavLink, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
-import { useDebouncedValue } from '../../hooks/useDebouncedValue'
-import { buildSearchUrl, parseTitleParam } from '../../features/movies/lib/movieRouteState'
-import { useRecentSearches } from '../../hooks/useRecentSearches'
+import { NavLink } from 'react-router-dom'
 import styles from './Header.module.css'
 import { SearchBar } from '../search-bar/SearchBar'
+import { useHeaderSearch } from '../../hooks/useHeaderSearch'
 
 type HeaderProps = {
   onOpenSidebar: () => void
 }
 
-type SearchDraftState = {
-  routeKey: string
-  value: string
-}
-
-const SEARCH_DEBOUNCE_MS = 700
-const MIN_SEARCH_LENGTH = 3
-
-function normalizeSearchValue(value: string): string {
-  return value.trim()
-}
-
 export function Header({ onOpenSidebar }: HeaderProps) {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const [searchParams] = useSearchParams()
-  const { addSearch } = useRecentSearches()
-
-  const routeTitle =
-    location.pathname === '/search' ? parseTitleParam(searchParams.get('title')) : ''
-
-  const routeInputValue = location.pathname === '/search' ? routeTitle : ''
-  const routeKey = `${location.pathname}?title=${routeTitle}`
-
-  const [draftState, setDraftState] = useState<SearchDraftState>(() => ({
-    routeKey,
-    value: routeInputValue,
-  }))
-
-  const searchValue = draftState.routeKey === routeKey ? draftState.value : routeInputValue
-  const debouncedSearchValue = useDebouncedValue(searchValue, SEARCH_DEBOUNCE_MS)
-
-  function commitSearch(rawValue: string, options?: { replace?: boolean }): void {
-    const normalizedValue = normalizeSearchValue(rawValue)
-
-    setDraftState({
-      routeKey,
-      value: normalizedValue,
-    })
-
-    if (!normalizedValue) {
-      void navigate('/', { replace: true })
-      return
-    }
-
-    if (normalizedValue.length < MIN_SEARCH_LENGTH) {
-      return
-    }
-
-    addSearch(normalizedValue)
-
-    void navigate(buildSearchUrl(normalizedValue), {
-      replace: options?.replace ?? location.pathname === '/search',
-    })
-  }
-
-  useEffect(() => {
-    const normalizedCurrentValue = normalizeSearchValue(searchValue)
-    const normalizedDebouncedValue = normalizeSearchValue(debouncedSearchValue)
-
-    if (normalizedDebouncedValue !== normalizedCurrentValue) {
-      return
-    }
-
-    if (!normalizedDebouncedValue) {
-      if (location.pathname === '/search') {
-        void navigate('/', { replace: true })
-      }
-
-      return
-    }
-
-    if (normalizedDebouncedValue.length < MIN_SEARCH_LENGTH) {
-      return
-    }
-
-    if (location.pathname === '/search' && routeTitle === normalizedDebouncedValue) {
-      return
-    }
-
-    addSearch(normalizedDebouncedValue)
-
-    void navigate(buildSearchUrl(normalizedDebouncedValue), {
-      replace: location.pathname === '/search',
-    })
-  }, [addSearch, debouncedSearchValue, location.pathname, navigate, routeTitle, searchValue])
-
-  function handleChange(nextValue: string): void {
-    setDraftState({
-      routeKey,
-      value: nextValue,
-    })
-  }
-
-  function handleSubmit(value: string): void {
-    commitSearch(value)
-  }
-
-  function handleClear(): void {
-    setDraftState({
-      routeKey,
-      value: '',
-    })
-
-    void navigate('/', { replace: true })
-  }
+  const { searchValue, handleChange, handleSubmit, handleClear } = useHeaderSearch()
 
   return (
     <div className={styles.header}>
