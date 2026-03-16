@@ -1,14 +1,25 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
 
 const STORAGE_KEY = 'movie-library:recent-searches'
-const MAX_ITEMS = 5
+const CHANGE_EVENT = 'movie-library:recent-searches-changed'
+const MAX_RECENT_SEARCHES = 5
 
-function normalize(value: string): string {
-  return value.trim().replace(/\s+/g, ' ')
-}
+let cachedSnapshot: string[] = []
 
 function canUseStorage(): boolean {
   return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
+}
+
+function normalizeSearchTerm(value: string): string {
+  return value.trim().replace(/\s+/g, ' ')
+}
+
+function areListsEqual(a: string[], b: string[]): boolean {
+  if (a.length !== b.length) {
+    return false
+  }
+
+  return a.every((item, index) => item === b[index])
 }
 
 function sanitizeStoredItems(input: unknown): string[] {
@@ -24,22 +35,22 @@ function sanitizeStoredItems(input: unknown): string[] {
       continue
     }
 
-    const normalized = normalize(item)
+    const normalizedItem = normalizeSearchTerm(item)
 
-    if (!normalized) {
+    if (!normalizedItem) {
       continue
     }
 
-    const key = normalized.toLowerCase()
+    const key = normalizedItem.toLowerCase()
 
     if (seen.has(key)) {
       continue
     }
 
     seen.add(key)
-    result.push(normalized)
+    result.push(normalizedItem)
 
-    if (result.length >= MAX_ITEMS) {
+    if (result.length >= MAX_RECENT_SEARCHES) {
       break
     }
   }
@@ -47,7 +58,7 @@ function sanitizeStoredItems(input: unknown): string[] {
   return result
 }
 
-function getRecentSearches(): string[] {
+function readFromStorage(): string[] {
   if (!canUseStorage()) {
     return []
   }
@@ -66,67 +77,124 @@ function getRecentSearches(): string[] {
   }
 }
 
-function saveRecentSearches(items: string[]): void {
-  if (!canUseStorage()) {
+function emitChange(): void {
+  if (typeof window === 'undefined') {
     return
   }
 
+  window.dispatchEvent(new Event(CHANGE_EVENT))
+}
+
+function syncSnapshotFromStorage(): string[] {
+  const nextSnapshot = readFromStorage()
+
+  if (!areListsEqual(cachedSnapshot, nextSnapshot)) {
+    cachedSnapshot = nextSnapshot
+  }
+
+  return cachedSnapshot
+}
+
+function writeSnapshot(nextValues: string[]): string[] {
+  const sanitizedValues = sanitizeStoredItems(nextValues)
+
+  if (!areListsEqual(cachedSnapshot, sanitizedValues)) {
+    cachedSnapshot = sanitizedValues
+  }
+
+  if (!canUseStorage()) {
+    return cachedSnapshot
+  }
+
   try {
-    if (items.length === 0) {
+    if (cachedSnapshot.length === 0) {
       window.localStorage.removeItem(STORAGE_KEY)
+    } else {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(cachedSnapshot))
+    }
+
+    emitChange()
+  } catch {
+    console.error('Failed to persist recent searches.')
+  }
+
+  return cachedSnapshot
+}
+
+function getRecentSearchesSnapshot(): string[] {
+  return syncSnapshotFromStorage()
+}
+
+function addRecentSearch(value: string): string[] {
+  const normalizedValue = normalizeSearchTerm(value)
+
+  if (!normalizedValue) {
+    return syncSnapshotFromStorage()
+  }
+
+  const nextValues = [
+    normalizedValue,
+    ...syncSnapshotFromStorage().filter(
+      (item) => item.toLowerCase() !== normalizedValue.toLowerCase(),
+    ),
+  ]
+
+  return writeSnapshot(nextValues)
+}
+
+function removeRecentSearch(value: string): string[] {
+  const normalizedValue = normalizeSearchTerm(value)
+
+  if (!normalizedValue) {
+    return syncSnapshotFromStorage()
+  }
+
+  const nextValues = syncSnapshotFromStorage().filter(
+    (item) => item.toLowerCase() !== normalizedValue.toLowerCase(),
+  )
+
+  return writeSnapshot(nextValues)
+}
+
+function clearRecentSearches(): string[] {
+  return writeSnapshot([])
+}
+
+function subscribeToRecentSearches(listener: () => void): () => void {
+  if (typeof window === 'undefined') {
+    return () => undefined
+  }
+
+  const handleLocalChange = (): void => {
+    syncSnapshotFromStorage()
+    listener()
+  }
+
+  const handleStorageChange = (event: StorageEvent): void => {
+    if (event.key !== STORAGE_KEY) {
       return
     }
 
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
-  } catch {
-    console.error('Failed to save recent searches.')
+    syncSnapshotFromStorage()
+    listener()
+  }
+
+  window.addEventListener(CHANGE_EVENT, handleLocalChange)
+  window.addEventListener('storage', handleStorageChange)
+
+  return () => {
+    window.removeEventListener(CHANGE_EVENT, handleLocalChange)
+    window.removeEventListener('storage', handleStorageChange)
   }
 }
 
 export function useRecentSearches() {
-  const [items, setItems] = useState<string[]>(() => getRecentSearches())
-
-  useEffect(() => {
-    saveRecentSearches(items)
-  }, [items])
-
-  const push = useCallback((value: string) => {
-    const normalizedValue = normalize(value)
-
-    if (!normalizedValue) {
-      return
-    }
-
-    setItems((currentItems) => {
-      return [
-        normalizedValue,
-        ...currentItems.filter((item) => item.toLowerCase() !== normalizedValue.toLowerCase()),
-      ].slice(0, MAX_ITEMS)
-    })
-  }, [])
-
-  const remove = useCallback((value: string) => {
-    const normalizedValue = normalize(value)
-
-    if (!normalizedValue) {
-      return
-    }
-
-    setItems((currentItems) =>
-      currentItems.filter((item) => item.toLowerCase() !== normalizedValue.toLowerCase()),
-    )
-  }, [])
-
-  const clear = useCallback(() => {
-    setItems([])
-  }, [])
+  const items = useSyncExternalStore(subscribeToRecentSearches, getRecentSearchesSnapshot, () => [])
 
   return {
     items,
-    push,
-    remove,
-    clear,
-    size: items.length,
-    isFull: items.length >= MAX_ITEMS,
+    addSearch: addRecentSearch,
+    removeSearch: removeRecentSearch,
+    clearSearches: clearRecentSearches,
   }
 }
