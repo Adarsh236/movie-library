@@ -1,10 +1,11 @@
 import { Type } from 'class-transformer'
-import { IsInt, Max, Min } from 'class-validator'
+import { IsInt, Min } from 'class-validator'
 
 export class PageQueryDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  @Max(500)
+  // TODO: Not needed for now
+  // @Max(500)
   page = 1
 }

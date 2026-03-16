@@ -44,12 +44,10 @@ describe('MoviesService', () => {
         {
           id: 1,
           title: 'Cached Movie',
-          releaseYear: '2024',
           releaseDateLabel: 'Jan 1, 2024',
           posterUrl: null,
           rating: 7.5,
           genres: ['Action'],
-          overview: 'Cached overview',
         },
       ],
       page: 1,

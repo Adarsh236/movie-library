@@ -13,7 +13,6 @@ export interface TmdbMovie {
   poster_path?: string | null
   vote_average: number
   genre_ids?: number[]
-  overview?: string
 }
 
 export type TmdbGenresResponse = z.infer<typeof tmdbGenresResponseSchema>

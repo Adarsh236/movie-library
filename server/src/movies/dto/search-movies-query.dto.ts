@@ -1,5 +1,5 @@
 import { Transform, Type } from 'class-transformer'
-import { IsInt, IsString, Matches, Max, MaxLength, Min, MinLength } from 'class-validator'
+import { IsInt, IsString, Matches, MaxLength, Min, MinLength } from 'class-validator'
 
 export class SearchMoviesQueryDto {
   @Transform(({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value))
@@ -14,6 +14,7 @@ export class SearchMoviesQueryDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  @Max(500)
+  // TODO: Not needed for now
+  // @Max(500)
   page = 1
 }

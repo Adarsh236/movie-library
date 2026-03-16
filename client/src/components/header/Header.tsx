@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import styles from './Header.module.css'
 import { SearchBar } from '../search-bar/SearchBar'
-import { useHeaderSearch } from '../../hooks/useHeaderSearch'
+import { useHeaderSearch } from '../../hooks/header-search/useHeaderSearch'
 
 type HeaderProps = {
   onOpenSidebar: () => void

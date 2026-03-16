@@ -8,7 +8,6 @@ describe('tmdbMoviesResponseSchema', () => {
         {
           id: 101,
           title: 'Batman Begins',
-          overview: 'Some overview',
           poster_path: '/poster.jpg',
           backdrop_path: '/backdrop.jpg',
           release_date: '2005-06-10',
