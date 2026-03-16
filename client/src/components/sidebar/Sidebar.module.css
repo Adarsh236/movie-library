@@ -30,7 +30,6 @@
 .heading {
   margin: 0;
   color: var(--color-text-muted);
-  font-family: var(--font-family-display);
   font-size: var(--font-size-xs);
   font-weight: 700;
   line-height: var(--line-height-tight);
