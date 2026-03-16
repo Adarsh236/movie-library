@@ -1,5 +1,5 @@
 import { baseApi } from './baseApi'
-import type { Genre, GenresResponse, MoviesResponse } from '../types/types'
+import type { Genre, GenresResponse, MoviesResponse } from '../../../types/types'
 import { ApiTag } from './api.constants'
 
 type GetMoviesParams = {

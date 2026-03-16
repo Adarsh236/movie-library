@@ -1,12 +1,12 @@
 import type { ReactNode } from 'react'
-import { MovieGrid } from '../../../../components/movie-grid/MovieGrid'
-import { Pagination } from '../../../../components/pagination/Pagination'
+import { MovieGrid } from '../movie-grid/MovieGrid'
+import { Pagination } from '../pagination/Pagination'
 import styles from './PageContent.module.css'
 import type { MoviesResponse } from '../../../../types/types'
-import { getApiErrorMessage } from '../../../../services/baseApi'
 import { Spinner } from '../../../../components/spinner/Spinner'
 import { ErrorState } from '../../../../components/error-state/ErrorState'
 import { EmptyState } from '../../../../components/empty-state/EmptyState'
+import { getApiErrorMessage } from '../../api/api.errors'
 
 type PageContentProps = {
   title: string

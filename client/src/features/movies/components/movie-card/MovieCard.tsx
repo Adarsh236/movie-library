@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import styles from './MovieCard.module.css'
-import type { Movie } from '../../types/types'
+import type { Movie } from '../../../../types/types'
 
 type MovieCardProps = {
   movie: Movie

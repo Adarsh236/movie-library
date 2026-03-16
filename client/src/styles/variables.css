@@ -1,24 +1,51 @@
 :root {
-  --color-bg: #000;
-  --color-bg-glow-top-left: #171717;
-  --color-glow-top-right: #1c1c1c;
-  --color-glow-bottom-right: #414141;
-  --color-glow-bottom-left: #272727;
-  --color-surface: rgba(25, 30, 37, 0.8);
-  --color-surface-2: #33373d;
-  --color-border: rgba(245, 197, 24);
-  --color-text: #f5f7ff;
-  --color-text-muted: #a7b4d1;
-  --color-primary: #f5c518;
+  --color-bg: #070707;
+  --color-surface: #101010;
+  --color-surface-2: #171717;
+  --color-border: #262626;
+  --color-text: #f5f5f5;
+  --color-text-muted: #9b9b9b;
+  --color-primary: #f2b300;
+  --color-primary-strong: #ffd04d;
+  --color-danger: #ff5c5c;
 
-  --shadow-sm: 0 4px 14px rgb(0 0 0 / 0.2);
+  --font-family-base: Inter, system-ui, sans-serif;
+  --font-family-display: Oswald, Impact, sans-serif;
 
-  --radius-md: 16px;
-  --radius-lg: 24px;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: 2rem;
 
-  --content-max-width: 1280px;
+  --line-height-tight: 1.15;
+  --line-height-base: 1.5;
 
-  --font-size-100: 0.875rem;
-  --font-size-200: 1rem;
-  --font-size-300: 1.125rem;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+
+  --layout-max-width: 90rem;
+  --sidebar-width: 18rem;
+}
+
+:root {
+  --header-height-mobile: 7.5rem;
+  --header-height-desktop: 4.5rem;
+  --header-height: var(--header-height-mobile);
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --header-height: var(--header-height-desktop);
+  }
 }

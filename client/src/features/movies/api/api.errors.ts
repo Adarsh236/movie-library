@@ -1,7 +1,7 @@
 import type { SerializedError } from '@reduxjs/toolkit'
 import type { FetchBaseQueryError } from '@reduxjs/toolkit/query'
-import type { ApiErrorPayload } from '../types/types'
-import { getNumberField, getStringField, isRecord } from '../utils/utils'
+import type { ApiErrorPayload } from '../../../types/types'
+import { getNumberField, getStringField, isRecord } from '../../../utils/utils'
 import {
   GENERIC_ERROR_MESSAGE,
   HTTP_ERROR_MESSAGES,
