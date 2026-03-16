@@ -20,7 +20,7 @@ export function MovieCard({ movie }: MovieCardProps) {
   const [hasImageError, setHasImageError] = useState(false)
 
   const posterSrc = useMemo(() => {
-    if (hasImageError || movie.posterUrl) {
+    if (hasImageError || !movie.posterUrl) {
       return FALLBACK_POSTER
     }
 

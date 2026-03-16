@@ -6,6 +6,7 @@ import { buildGenreUrl, parseGenreIdParam, parsePageParam } from '../lib/movieRo
 import { Spinner } from '../../../components/spinner/Spinner'
 import { ErrorState } from '../../../components/error-state/ErrorState'
 import { EmptyState } from '../../../components/empty-state/EmptyState'
+import { getApiErrorMessage } from '../api/api.errors'
 
 export function GenrePage() {
   const navigate = useNavigate()
@@ -48,7 +49,9 @@ export function GenrePage() {
       isLoading={moviesQuery.isLoading}
       isFetching={moviesQuery.isFetching}
       error={moviesQuery.error}
-      onPageChange={(nextPage) => navigate(buildGenreUrl(genreId, nextPage))}
+      onPageChange={(nextPage) => {
+        void navigate(buildGenreUrl(genreId, nextPage))
+      }}
       emptyState={
         <EmptyState
           title={`No ${selectedGenre.label} movies found`}

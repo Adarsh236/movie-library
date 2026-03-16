@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { NavLink, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useDebouncedValue } from '../../hooks/useDebouncedValue'
 import { buildSearchUrl, parseTitleParam } from '../../features/movies/lib/movieRouteState'
@@ -10,8 +10,17 @@ type HeaderProps = {
   onOpenSidebar: () => void
 }
 
+type SearchDraftState = {
+  routeKey: string
+  value: string
+}
+
 const SEARCH_DEBOUNCE_MS = 400
-const MIN_SEARCH_LENGTH = 2
+const MIN_SEARCH_LENGTH = 3
+
+function normalizeSearchValue(value: string): string {
+  return value.trim()
+}
 
 export function Header({ onOpenSidebar }: HeaderProps) {
   const navigate = useNavigate()
@@ -19,46 +28,31 @@ export function Header({ onOpenSidebar }: HeaderProps) {
   const [searchParams] = useSearchParams()
   const { addSearch } = useRecentSearches()
 
-  const isSyncingFromRouteRef = useRef(false)
+  const routeTitle =
+    location.pathname === '/search' ? parseTitleParam(searchParams.get('title')) : ''
 
-  const routeTitle = useMemo(() => {
-    return location.pathname === '/search' ? parseTitleParam(searchParams.get('title')) : ''
-  }, [location.pathname, searchParams])
+  const routeInputValue = location.pathname === '/search' ? routeTitle : ''
+  const routeKey = `${location.pathname}?title=${routeTitle}`
 
-  const [searchValue, setSearchValue] = useState(routeTitle)
+  const [draftState, setDraftState] = useState<SearchDraftState>(() => ({
+    routeKey,
+    value: routeInputValue,
+  }))
+
+  const searchValue = draftState.routeKey === routeKey ? draftState.value : routeInputValue
   const debouncedSearchValue = useDebouncedValue(searchValue, SEARCH_DEBOUNCE_MS)
 
   useEffect(() => {
-    const nextValue = location.pathname === '/search' ? routeTitle : ''
+    const normalizedCurrentValue = normalizeSearchValue(searchValue)
+    const normalizedDebouncedValue = normalizeSearchValue(debouncedSearchValue)
 
-    isSyncingFromRouteRef.current = true
-
-    setSearchValue((currentValue) => {
-      return currentValue === nextValue ? currentValue : nextValue
-    })
-  }, [location.pathname, routeTitle])
-
-  useEffect(() => {
-    const nextRouteValue = location.pathname === '/search' ? routeTitle : ''
-
-    if (isSyncingFromRouteRef.current) {
-      if (searchValue === nextRouteValue) {
-        isSyncingFromRouteRef.current = false
-      }
-
-      return
-    }
-
-    const normalizedInputValue = searchValue.trim()
-    const normalizedDebouncedValue = debouncedSearchValue.trim()
-
-    if (normalizedDebouncedValue !== normalizedInputValue) {
+    if (normalizedDebouncedValue !== normalizedCurrentValue) {
       return
     }
 
     if (!normalizedDebouncedValue) {
       if (location.pathname === '/search') {
-        navigate('/', { replace: true })
+        void navigate('/', { replace: true })
       }
 
       return
@@ -72,17 +66,28 @@ export function Header({ onOpenSidebar }: HeaderProps) {
       return
     }
 
-    navigate(buildSearchUrl(normalizedDebouncedValue), {
+    void navigate(buildSearchUrl(normalizedDebouncedValue), {
       replace: location.pathname === '/search',
     })
-  }, [debouncedSearchValue, searchValue, location.pathname, navigate, routeTitle])
+  }, [debouncedSearchValue, location.pathname, navigate, routeTitle, searchValue])
 
-  function handleSubmit(value: string) {
-    const normalizedValue = value.trim()
+  function handleChange(nextValue: string): void {
+    setDraftState({
+      routeKey,
+      value: nextValue,
+    })
+  }
+
+  function handleSubmit(value: string): void {
+    const normalizedValue = normalizeSearchValue(value)
+
+    setDraftState({
+      routeKey,
+      value: normalizedValue,
+    })
 
     if (!normalizedValue) {
-      setSearchValue('')
-      navigate('/')
+      void navigate('/')
       return
     }
 
@@ -91,13 +96,16 @@ export function Header({ onOpenSidebar }: HeaderProps) {
     }
 
     addSearch(normalizedValue)
-    navigate(buildSearchUrl(normalizedValue))
+    void navigate(buildSearchUrl(normalizedValue))
   }
 
-  function handleClear() {
-    isSyncingFromRouteRef.current = true
-    setSearchValue('')
-    navigate('/', { replace: true })
+  function handleClear(): void {
+    setDraftState({
+      routeKey,
+      value: '',
+    })
+
+    void navigate('/', { replace: true })
   }
 
   return (
@@ -113,14 +121,14 @@ export function Header({ onOpenSidebar }: HeaderProps) {
         </button>
 
         <NavLink to='/' className={styles.logo}>
-          CINEVAULT
+          MOVIE Lib
         </NavLink>
       </div>
 
       <div className={styles.searchSlot}>
         <SearchBar
           value={searchValue}
-          onChange={setSearchValue}
+          onChange={handleChange}
           onSubmit={handleSubmit}
           onClear={handleClear}
           placeholder='Search movies by title'

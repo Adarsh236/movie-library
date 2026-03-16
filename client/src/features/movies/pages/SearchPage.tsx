@@ -29,7 +29,9 @@ export function SearchPage() {
       isLoading={query.isLoading}
       isFetching={query.isFetching}
       error={query.error}
-      onPageChange={(nextPage) => navigate(buildSearchUrl(title, nextPage))}
+      onPageChange={(nextPage) => {
+        void navigate(buildSearchUrl(title, nextPage))
+      }}
       emptyState={<p>No matches found for "{title}".</p>}
     />
   )
