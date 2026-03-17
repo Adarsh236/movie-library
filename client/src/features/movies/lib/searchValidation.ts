@@ -7,23 +7,28 @@ type ShouldNavigateArgs = {
 
 export const SEARCH_TITLE_MIN_LENGTH = 3
 export const SEARCH_TITLE_MAX_LENGTH = 100
+const CONTROL_CHARACTER_PATTERN = /\p{Cc}/u
 
 export function normalizeSearchTitle(value: string): string {
   return value.trim().replace(/\s+/g, ' ')
 }
 
-export function isValidSearchTitle(value: string): boolean {
-  const normalizedValue = normalizeSearchTitle(value)
-
-  if (!isSearchLongEnough(normalizedValue, SEARCH_TITLE_MIN_LENGTH)) {
+export function isValidSearchTitle(value: unknown): boolean {
+  if (typeof value !== 'string') {
     return false
   }
+
+  if (CONTROL_CHARACTER_PATTERN.test(value)) {
+    return false
+  }
+
+  const normalizedValue = normalizeSearchTitle(value)
 
   if (normalizedValue.length > SEARCH_TITLE_MAX_LENGTH) {
     return false
   }
 
-  return !/\p{Cc}/u.test(normalizedValue)
+  return isSearchLongEnough(normalizedValue, SEARCH_TITLE_MIN_LENGTH)
 }
 
 export function getValidSearchTitle(value: string): string | null {
