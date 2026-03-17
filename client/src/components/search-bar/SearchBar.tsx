@@ -1,4 +1,4 @@
-import { type FormEvent } from 'react'
+import { type SubmitEvent } from 'react'
 import clsx from 'clsx'
 import { Button } from '../button/Button'
 import styles from './SearchBar.module.css'
@@ -25,7 +25,7 @@ export function SearchBar({
   onSubmit,
   onClear,
 }: SearchBarProps) {
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     onSubmit(value)
   }
