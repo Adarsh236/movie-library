@@ -13,15 +13,23 @@ export function useSearchDraft(routeKey: string, routeValue: string) {
 
   const searchValue = draft.routeKey === routeKey ? draft.value : routeValue
 
-  function setDraftValue(nextValue: string) {
+  function setDraftValue(nextValue: string, nextRouteKey = routeKey) {
     setDraft({
-      routeKey,
+      routeKey: nextRouteKey,
       value: nextValue,
+    })
+  }
+
+  function clearDraft(nextRouteKey = routeKey) {
+    setDraft({
+      routeKey: nextRouteKey,
+      value: '',
     })
   }
 
   return {
     searchValue,
     setDraftValue,
+    clearDraft,
   }
 }

@@ -1,20 +1,15 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Outlet, useLocation } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Outlet } from 'react-router-dom'
 import { AppShell } from '../components/app-shell/AppShell'
 import { Header } from '../components/header/Header'
 import { Sidebar } from '../components/sidebar/Sidebar'
+import { useHeaderSearch } from '../hooks/header-search/useHeaderSearch'
 
 export function RootLayout() {
-  const location = useLocation()
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
-  const routeKey = useMemo(
-    () => `${location.pathname}${location.search}`,
-    [location.pathname, location.search],
-  )
-
-  const [openedForRoute, setOpenedForRoute] = useState<string | null>(null)
-
-  const isSidebarOpen = openedForRoute === routeKey
+  const { searchValue, handleChange, handleSubmit, handleClear, resetSearchDraft } =
+    useHeaderSearch()
 
   useEffect(() => {
     if (!isSidebarOpen) {
@@ -29,12 +24,32 @@ export function RootLayout() {
     }
   }, [isSidebarOpen])
 
+  function handleSidebarClose(): void {
+    setIsSidebarOpen(false)
+  }
+
+  function handlePrimaryNavigate(nextRoute: string): void {
+    resetSearchDraft(nextRoute)
+    setIsSidebarOpen(false)
+  }
+
   return (
     <AppShell
-      header={<Header onOpenSidebar={() => setOpenedForRoute(routeKey)} />}
-      sidebar={<Sidebar onNavigate={() => setOpenedForRoute(null)} />}
+      header={
+        <Header
+          onOpenSidebar={() => setIsSidebarOpen(true)}
+          searchValue={searchValue}
+          onSearchChange={handleChange}
+          onSearchSubmit={handleSubmit}
+          onSearchClear={handleClear}
+          onPrimaryNavigate={handlePrimaryNavigate}
+        />
+      }
+      sidebar={
+        <Sidebar onNavigate={handleSidebarClose} onPrimaryNavigate={handlePrimaryNavigate} />
+      }
       isSidebarOpen={isSidebarOpen}
-      onSidebarClose={() => setOpenedForRoute(null)}
+      onSidebarClose={handleSidebarClose}
     >
       <Outlet />
     </AppShell>

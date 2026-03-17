@@ -7,9 +7,10 @@ import styles from './Sidebar.module.css'
 
 type SidebarProps = {
   onNavigate?: () => void
+  onPrimaryNavigate?: (nextRoute: string) => void
 }
 
-export function Sidebar({ onNavigate }: SidebarProps) {
+export function Sidebar({ onNavigate, onPrimaryNavigate }: SidebarProps) {
   const [searchParams] = useSearchParams()
   const title = searchParams.get('title')
   const { data: genres = [], isLoading, isError } = useGetGenresQuery()
@@ -53,7 +54,10 @@ export function Sidebar({ onNavigate }: SidebarProps) {
         <nav className={styles.nav} aria-label='Primary sidebar navigation'>
           <NavLink
             to={buildHomeUrl()}
-            onClick={onNavigate}
+            onClick={() => {
+              onPrimaryNavigate?.('/')
+              onNavigate?.()
+            }}
             end
             className={({ isActive }) => (isActive ? styles.activeLink : styles.link)}
           >
@@ -62,7 +66,10 @@ export function Sidebar({ onNavigate }: SidebarProps) {
 
           <NavLink
             to='/about'
-            onClick={onNavigate}
+            onClick={() => {
+              onPrimaryNavigate?.('/about')
+              onNavigate?.()
+            }}
             className={({ isActive }) => (isActive ? styles.activeLink : styles.link)}
           >
             About

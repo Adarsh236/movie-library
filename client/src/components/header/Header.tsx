@@ -1,16 +1,24 @@
 import { NavLink } from 'react-router-dom'
 import styles from './Header.module.css'
 import { SearchBar } from '../search-bar/SearchBar'
-import { useHeaderSearch } from '../../hooks/header-search/useHeaderSearch'
 
 type HeaderProps = {
   onOpenSidebar: () => void
+  searchValue: string
+  onSearchChange: (value: string) => void
+  onSearchSubmit: (value: string) => void
+  onSearchClear: () => void
+  onPrimaryNavigate: (nextRoute: string) => void
 }
 
-export function Header({ onOpenSidebar }: HeaderProps) {
-  const { searchValue, handleChange, handleSubmit, handleClear, resetSearchDraft } =
-    useHeaderSearch()
-
+export function Header({
+  onOpenSidebar,
+  searchValue,
+  onSearchChange,
+  onSearchSubmit,
+  onSearchClear,
+  onPrimaryNavigate,
+}: HeaderProps) {
   return (
     <div className={styles.header}>
       <div className={styles.start}>
@@ -23,7 +31,7 @@ export function Header({ onOpenSidebar }: HeaderProps) {
           ☰
         </button>
 
-        <NavLink to='/' className={styles.logo}>
+        <NavLink to='/' onClick={() => onPrimaryNavigate('/')} className={styles.logo}>
           MOVIE Lib
         </NavLink>
       </div>
@@ -31,9 +39,9 @@ export function Header({ onOpenSidebar }: HeaderProps) {
       <div className={styles.searchSlot}>
         <SearchBar
           value={searchValue}
-          onChange={handleChange}
-          onSubmit={handleSubmit}
-          onClear={handleClear}
+          onChange={onSearchChange}
+          onSubmit={onSearchSubmit}
+          onClear={onSearchClear}
           placeholder='Search movies by title'
         />
       </div>
@@ -41,7 +49,7 @@ export function Header({ onOpenSidebar }: HeaderProps) {
       <nav className={styles.end} aria-label='Top navigation'>
         <NavLink
           to='/about'
-          onClick={resetSearchDraft}
+          onClick={() => onPrimaryNavigate('/about')}
           className={({ isActive }) => (isActive ? styles.activeLink : styles.link)}
         >
           About

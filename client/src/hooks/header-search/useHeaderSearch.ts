@@ -23,7 +23,7 @@ export function useHeaderSearch(options: UseHeaderSearchOptions = {}) {
   const { addSearch } = useRecentSearches()
 
   const { pathname, routeTitle, routeValue, routeKey } = useHeaderSearchRoute()
-  const { searchValue, setDraftValue } = useSearchDraft(routeKey, routeValue)
+  const { searchValue, setDraftValue, clearDraft } = useSearchDraft(routeKey, routeValue)
 
   useRecentSearchRouteSync({
     pathname,
@@ -53,6 +53,7 @@ export function useHeaderSearch(options: UseHeaderSearchOptions = {}) {
     setDraftValue(normalizedValue)
 
     if (!normalizedValue) {
+      clearDraft('/')
       void navigate('/', { replace: true })
       return
     }
@@ -75,8 +76,8 @@ export function useHeaderSearch(options: UseHeaderSearchOptions = {}) {
     void navigate('/', { replace: true })
   }
 
-  function resetSearchDraft(): void {
-    setDraftValue('')
+  function resetSearchDraft(nextRouteKey = routeKey) {
+    clearDraft(nextRouteKey)
   }
 
   return {
