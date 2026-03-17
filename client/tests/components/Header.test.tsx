@@ -1,15 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { Header } from '@/components/header/Header'
-
-const { mockUseHeaderSearch } = vi.hoisted(() => ({
-  mockUseHeaderSearch: vi.fn(),
-}))
-
-vi.mock('@/hooks/header-search/useHeaderSearch', () => ({
-  useHeaderSearch: mockUseHeaderSearch,
-}))
 
 vi.mock('@/components/search-bar/SearchBar', () => ({
   SearchBar: ({
@@ -50,24 +42,24 @@ vi.mock('@/components/search-bar/SearchBar', () => ({
 }))
 
 describe('Header', () => {
-  beforeEach(() => {
-    mockUseHeaderSearch.mockReset()
-    mockUseHeaderSearch.mockReturnValue({
+  function renderHeader(overrides: Partial<React.ComponentProps<typeof Header>> = {}) {
+    const props: React.ComponentProps<typeof Header> = {
+      onOpenSidebar: vi.fn(),
       searchValue: 'batman',
-      handleChange: vi.fn(),
-      handleSubmit: vi.fn(),
-      handleClear: vi.fn(),
-    })
-  })
+      onSearchChange: vi.fn(),
+      onSearchSubmit: vi.fn(),
+      onSearchClear: vi.fn(),
+      onPrimaryNavigate: vi.fn(),
+      ...overrides,
+    }
 
-  function renderHeader(onOpenSidebar = vi.fn()) {
     render(
       <MemoryRouter>
-        <Header onOpenSidebar={onOpenSidebar} />
+        <Header {...props} />
       </MemoryRouter>,
     )
 
-    return { onOpenSidebar }
+    return props
   }
 
   it('renders the logo and current search value', () => {
@@ -78,76 +70,72 @@ describe('Header', () => {
   })
 
   it('opens the sidebar when the menu button is clicked', () => {
-    const { onOpenSidebar } = renderHeader()
+    const props = renderHeader()
 
     fireEvent.click(screen.getByRole('button', { name: /open navigation menu/i }))
 
-    expect(onOpenSidebar).toHaveBeenCalledTimes(1)
+    expect(props.onOpenSidebar).toHaveBeenCalledTimes(1)
   })
 
-  it('forwards search input changes to the hook', () => {
-    const handleChange = vi.fn()
+  it('forwards search input changes', () => {
+    const onSearchChange = vi.fn()
 
-    mockUseHeaderSearch.mockReturnValue({
-      searchValue: 'batman',
-      handleChange,
-      handleSubmit: vi.fn(),
-      handleClear: vi.fn(),
-    })
-
-    renderHeader()
+    renderHeader({ onSearchChange })
 
     fireEvent.change(screen.getByLabelText('mock-search-input'), {
       target: { value: 'superman' },
     })
 
-    expect(handleChange).toHaveBeenCalledWith('superman')
+    expect(onSearchChange).toHaveBeenCalledWith('superman')
   })
 
-  it('submits the current search value through the hook', () => {
-    const handleSubmit = vi.fn()
+  it('submits the current search value', () => {
+    const onSearchSubmit = vi.fn()
 
-    mockUseHeaderSearch.mockReturnValue({
-      searchValue: 'batman',
-      handleChange: vi.fn(),
-      handleSubmit,
-      handleClear: vi.fn(),
-    })
-
-    renderHeader()
+    renderHeader({ onSearchSubmit })
 
     fireEvent.submit(screen.getByRole('search'))
 
-    expect(handleSubmit).toHaveBeenCalledWith('batman')
+    expect(onSearchSubmit).toHaveBeenCalledWith('batman')
   })
 
-  it('clears the search through the hook', () => {
-    const handleClear = vi.fn()
+  it('clears the search', () => {
+    const onSearchClear = vi.fn()
 
-    mockUseHeaderSearch.mockReturnValue({
-      searchValue: 'batman',
-      handleChange: vi.fn(),
-      handleSubmit: vi.fn(),
-      handleClear,
-    })
-
-    renderHeader()
+    renderHeader({ onSearchClear })
 
     fireEvent.click(screen.getByRole('button', { name: /clear search/i }))
 
-    expect(handleClear).toHaveBeenCalledTimes(1)
+    expect(onSearchClear).toHaveBeenCalledTimes(1)
   })
 
   it('does not render the clear button when the search is empty', () => {
-    mockUseHeaderSearch.mockReturnValue({
+    renderHeader({
       searchValue: '',
-      handleChange: vi.fn(),
-      handleSubmit: vi.fn(),
-      handleClear: vi.fn(),
     })
 
-    renderHeader()
-
     expect(screen.queryByRole('button', { name: /clear search/i })).not.toBeInTheDocument()
+  })
+
+  it('calls onPrimaryNavigate with / when logo is clicked', () => {
+    const onPrimaryNavigate = vi.fn()
+
+    renderHeader({ onPrimaryNavigate })
+
+    fireEvent.click(screen.getByRole('link', { name: /movie lib/i }))
+
+    expect(onPrimaryNavigate).toHaveBeenCalledTimes(1)
+    expect(onPrimaryNavigate).toHaveBeenCalledWith('/')
+  })
+
+  it('calls onPrimaryNavigate with /about when about link is clicked', () => {
+    const onPrimaryNavigate = vi.fn()
+
+    renderHeader({ onPrimaryNavigate })
+
+    fireEvent.click(screen.getByRole('link', { name: /about/i, hidden: true }))
+
+    expect(onPrimaryNavigate).toHaveBeenCalledTimes(1)
+    expect(onPrimaryNavigate).toHaveBeenCalledWith('/about')
   })
 })

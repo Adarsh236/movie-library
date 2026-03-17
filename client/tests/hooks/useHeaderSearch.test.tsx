@@ -1,5 +1,5 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
-import { RouterProvider, createMemoryRouter, useLocation } from 'react-router-dom'
+import { RouterProvider, createMemoryRouter, useLocation, useNavigate } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useHeaderSearch } from '@/hooks/header-search/useHeaderSearch'
 
@@ -17,12 +17,14 @@ vi.mock('@/hooks/useRecentSearches', () => ({
 }))
 
 function HeaderSearchHarness() {
-  const { searchValue, handleChange, handleSubmit, handleClear } = useHeaderSearch({
-    debounceMs: 700,
-    minSearchLength: 3,
-  })
+  const { searchValue, handleChange, handleSubmit, handleClear, resetSearchDraft } =
+    useHeaderSearch({
+      debounceMs: 700,
+      minSearchLength: 3,
+    })
 
   const location = useLocation()
+  const navigate = useNavigate()
 
   return (
     <div>
@@ -38,6 +40,26 @@ function HeaderSearchHarness() {
 
       <button type='button' onClick={handleClear}>
         clear
+      </button>
+
+      <button
+        type='button'
+        onClick={() => {
+          resetSearchDraft('/about')
+          void navigate('/about')
+        }}
+      >
+        reset-about
+      </button>
+
+      <button
+        type='button'
+        onClick={() => {
+          resetSearchDraft('/')
+          void navigate('/')
+        }}
+      >
+        reset-home
       </button>
 
       <div data-testid='location'>
@@ -66,6 +88,8 @@ function renderWithRouter(initialEntries: string[] = ['/']) {
     input: screen.getByLabelText('search-input'),
     submitButton: screen.getByRole('button', { name: 'submit' }),
     clearButton: screen.getByRole('button', { name: 'clear' }),
+    resetAboutButton: screen.getByRole('button', { name: 'reset-about' }),
+    resetHomeButton: screen.getByRole('button', { name: 'reset-home' }),
     getLocationText: () => screen.getByTestId('location').textContent ?? '',
   }
 }
@@ -170,5 +194,32 @@ describe('useHeaderSearch', () => {
     expect(router.state.location.pathname).toBe('/')
     expect(router.state.location.search).toBe('')
     expect(addSearchMock).not.toHaveBeenCalled()
+  })
+
+  it('clears the visible draft after resetting for about and navigating there', async () => {
+    const { input, resetAboutButton, router } = renderWithRouter(['/search?title=batman'])
+
+    expect(input).toHaveValue('batman')
+
+    fireEvent.click(resetAboutButton)
+
+    await flushMicrotasks()
+
+    expect(router.state.location.pathname).toBe('/about')
+    expect(screen.getByLabelText('search-input')).toHaveValue('')
+  })
+
+  it('clears the visible draft after resetting for home and navigating there', async () => {
+    const { input, resetHomeButton, router } = renderWithRouter(['/search?title=batman'])
+
+    expect(input).toHaveValue('batman')
+
+    fireEvent.click(resetHomeButton)
+
+    await flushMicrotasks()
+
+    expect(router.state.location.pathname).toBe('/')
+    expect(router.state.location.search).toBe('')
+    expect(screen.getByLabelText('search-input')).toHaveValue('')
   })
 })
