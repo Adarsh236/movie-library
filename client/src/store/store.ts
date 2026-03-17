@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query'
 import { baseApi } from '../features/movies/api/baseApi'
-import { asyncFetchTimeMiddleware } from './asyncFetchTimeMiddleware'
+import { asyncRequestTimingMiddleware } from './asyncRequestTimingMiddleware'
 import { useDispatch, type TypedUseSelectorHook, useSelector } from 'react-redux'
 
 export const store = configureStore({
@@ -12,7 +12,7 @@ export const store = configureStore({
     getDefaultMiddleware({
       serializableCheck: true,
       immutableCheck: true,
-    }).concat(baseApi.middleware, asyncFetchTimeMiddleware),
+    }).concat(baseApi.middleware, asyncRequestTimingMiddleware),
 })
 
 setupListeners(store.dispatch)

@@ -13,6 +13,9 @@ const getActionType = (action: unknown): string | null => {
   return isNonEmptyString(action.type) ? action.type : null
 }
 
+const getBaseActionType = (actionType: string): string =>
+  actionType.replace(/\/(pending|fulfilled|rejected)$/, '')
+
 const getRequestId = (action: unknown): string | null => {
   if (!isRecord(action)) {
     return null
@@ -40,10 +43,10 @@ const getSettledStatus = (action: unknown): SettledStatus | null => {
 }
 
 const deleteOldestTrackedRequest = (requestStartTimes: Map<string, number>): void => {
-  const oldestRequestId = requestStartTimes.keys().next().value
+  const iteratorResult = requestStartTimes.keys().next()
 
-  if (oldestRequestId) {
-    requestStartTimes.delete(oldestRequestId)
+  if (!iteratorResult.done) {
+    requestStartTimes.delete(iteratorResult.value)
   }
 }
 
@@ -70,7 +73,7 @@ const consumeRequestDuration = (
   return Math.max(0, Math.round(getCurrentTimestamp() - startedAt))
 }
 
-export const asyncFetchTimeMiddleware: Middleware = () => {
+export const asyncRequestTimingMiddleware: Middleware = () => {
   const requestStartTimes = new Map<string, number>()
 
   return (next) => (action) => {
@@ -103,7 +106,9 @@ export const asyncFetchTimeMiddleware: Middleware = () => {
       const durationMs = consumeRequestDuration(requestStartTimes, requestId)
 
       if (durationMs !== null) {
-        console.info(`[fetch-timing] ${actionType} (${status}) completed in ${durationMs}ms`)
+        console.log(
+          `[request-timing] ${getBaseActionType(actionType)} (${status}) completed in ${durationMs}ms`,
+        )
       }
     }
   }
