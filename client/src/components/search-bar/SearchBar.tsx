@@ -2,6 +2,7 @@ import { type FormEvent } from 'react'
 import clsx from 'clsx'
 import { Button } from '../button/Button'
 import styles from './SearchBar.module.css'
+import { isNonEmptyString } from '../../utils/utils'
 
 type SearchBarProps = {
   id?: string
@@ -29,7 +30,7 @@ export function SearchBar({
     onSubmit(value)
   }
 
-  const hasValue = value.trim().length > 0
+  const hasValue = isNonEmptyString(value)
 
   return (
     <form className={clsx(styles.form, className)} onSubmit={handleSubmit} role='search'>

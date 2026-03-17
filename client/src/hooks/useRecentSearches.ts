@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react'
+import { getValidSearchTitle } from '../features/movies/lib/searchValidation'
 
 const STORAGE_KEY = 'movie-library:recent-searches'
 const CHANGE_EVENT = 'movie-library:recent-searches-changed'
@@ -8,10 +9,6 @@ let cachedSnapshot: string[] = []
 
 function canUseStorage(): boolean {
   return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
-}
-
-function normalizeSearchTerm(value: string): string {
-  return value.trim().replace(/\s+/g, ' ')
 }
 
 function areListsEqual(a: string[], b: string[]): boolean {
@@ -35,7 +32,7 @@ function sanitizeStoredItems(input: unknown): string[] {
       continue
     }
 
-    const normalizedItem = normalizeSearchTerm(item)
+    const normalizedItem = getValidSearchTitle(item)
 
     if (!normalizedItem) {
       continue
@@ -126,7 +123,7 @@ function getRecentSearchesSnapshot(): string[] {
 }
 
 function addRecentSearch(value: string): string[] {
-  const normalizedValue = normalizeSearchTerm(value)
+  const normalizedValue = getValidSearchTitle(value)
 
   if (!normalizedValue) {
     return syncSnapshotFromStorage()
@@ -143,7 +140,7 @@ function addRecentSearch(value: string): string[] {
 }
 
 function removeRecentSearch(value: string): string[] {
-  const normalizedValue = normalizeSearchTerm(value)
+  const normalizedValue = getValidSearchTitle(value)
 
   if (!normalizedValue) {
     return syncSnapshotFromStorage()

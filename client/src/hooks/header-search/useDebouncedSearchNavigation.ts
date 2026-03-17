@@ -1,6 +1,10 @@
 import { useEffect, useRef } from 'react'
 import { buildSearchUrl } from '../../features/movies/lib/movieRouteState'
-import { normalizeSearchValue, shouldNavigateToSearch, shouldRedirectHome } from './search.helpers'
+import {
+  normalizeSearchTitle,
+  shouldNavigateToSearch,
+  shouldRedirectHome,
+} from '../../features/movies/lib/searchValidation'
 
 type UseDebouncedSearchNavigationArgs = {
   searchValue: string
@@ -34,7 +38,7 @@ export function useDebouncedSearchNavigation({
     const capturedValue = searchValue
 
     timerRef.current = window.setTimeout(() => {
-      const normalizedValue = normalizeSearchValue(capturedValue)
+      const normalizedValue = normalizeSearchTitle(capturedValue)
 
       if (capturedRouteKey !== routeKey) {
         return

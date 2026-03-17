@@ -1,5 +1,8 @@
 import { useEffect } from 'react'
-import { normalizeSearchValue, isSearchLongEnough } from './search.helpers'
+import {
+  normalizeSearchTitle,
+  isSearchLongEnough,
+} from '../../features/movies/lib/searchValidation'
 
 type UseRecentSearchRouteSyncArgs = {
   pathname: string
@@ -15,7 +18,7 @@ export function useRecentSearchRouteSync({
   addSearch,
 }: UseRecentSearchRouteSyncArgs) {
   useEffect(() => {
-    const normalizedRouteTitle = normalizeSearchValue(routeTitle)
+    const normalizedRouteTitle = normalizeSearchTitle(routeTitle)
 
     if (pathname !== '/search') {
       return

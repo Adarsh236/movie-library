@@ -3,9 +3,13 @@ import { buildSearchUrl } from '../../features/movies/lib/movieRouteState'
 import { useSearchDraft } from './useSearchDraft'
 import { useRecentSearchRouteSync } from './useRecentSearchRouteSync'
 import { useDebouncedSearchNavigation } from './useDebouncedSearchNavigation'
-import { isSearchLongEnough, normalizeSearchValue } from './search.helpers'
 import { useRecentSearches } from '../useRecentSearches'
 import { useHeaderSearchRoute } from './useHeaderSearchRoute'
+import {
+  getValidSearchTitle,
+  normalizeSearchTitle,
+  SEARCH_TITLE_MIN_LENGTH,
+} from '../../features/movies/lib/searchValidation'
 
 type UseHeaderSearchOptions = {
   debounceMs?: number
@@ -13,7 +17,7 @@ type UseHeaderSearchOptions = {
 }
 
 export function useHeaderSearch(options: UseHeaderSearchOptions = {}) {
-  const { debounceMs = 700, minSearchLength = 3 } = options
+  const { debounceMs = 700, minSearchLength = SEARCH_TITLE_MIN_LENGTH } = options
 
   const navigate = useNavigate()
   const { addSearch } = useRecentSearches()
@@ -44,7 +48,7 @@ export function useHeaderSearch(options: UseHeaderSearchOptions = {}) {
   }
 
   function handleSubmit(value: string) {
-    const normalizedValue = normalizeSearchValue(value)
+    const normalizedValue = normalizeSearchTitle(value)
 
     setDraftValue(normalizedValue)
 
@@ -53,7 +57,7 @@ export function useHeaderSearch(options: UseHeaderSearchOptions = {}) {
       return
     }
 
-    if (!isSearchLongEnough(normalizedValue, minSearchLength)) {
+    if (!getValidSearchTitle(normalizedValue)) {
       return
     }
 
