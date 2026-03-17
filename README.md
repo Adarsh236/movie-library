@@ -129,7 +129,6 @@ Create `server/.env`:
 PORT=4000
 CLIENT_ORIGINS=http://localhost:5173
 TMDB_ACCESS_TOKEN=your_tmdb_access_token
-TMDB_BASE_URL=https://api.themoviedb.org/3
 ```
 
 ### Notes
@@ -137,7 +136,7 @@ TMDB_BASE_URL=https://api.themoviedb.org/3
 - `PORT` is the port used by the NestJS server.
 - `CLIENT_ORIGINS` is used for CORS so the frontend can call the backend locally.
 - `TMDB_ACCESS_TOKEN` is required for authenticated requests to TMDB.
-- `TMDB_BASE_URL` points to the TMDB API base URL.
+- `TMDB BASE URL` is hardcoded in tmdb service for now (https://api.themoviedb.org/3)
 
 A sample `.env.example` file is included in both the client and server folders.
 

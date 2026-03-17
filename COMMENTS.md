@@ -198,8 +198,8 @@ For the current scope, the implementation is appropriate. At higher traffic, the
 - **List virtualization**  
   Worth adding once result sets are large enough for rendering cost to matter.
 
-- **Styling scalability**  
-  CSS Modules were a good fit here. In a larger team or more design-heavy product, SCSS or Tailwind could be considered depending on how the styling workflow evolves.
+- **Styling scalability & UI**  
+  CSS Modules were a good fit here. In a larger team or more design-heavy product, SCSS or Tailwind could be considered depending on how the styling workflow evolves. Also to add functionality to select from recent searches.
 
 - **Backend operational maturity**  
   Better monitoring, stronger cache strategy, and more explicit fallback behavior would be the next step toward production readiness.
