@@ -120,7 +120,7 @@
   outline-offset: 0.125rem;
 }
 
-@media (min-width: 48rem) {
+@media (min-width: 768px) {
   .header {
     grid-template-columns: auto minmax(0, 1fr) auto;
     gap: var(--space-4);
@@ -136,7 +136,7 @@
   }
 }
 
-@media (min-width: 64rem) {
+@media (min-width: 1024px) {
   .header {
     padding: 1rem 1.5rem;
   }

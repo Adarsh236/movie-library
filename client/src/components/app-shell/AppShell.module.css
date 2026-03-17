@@ -64,7 +64,7 @@
   padding: 1rem;
 }
 
-@media (min-width: 64rem) {
+@media (min-width: 1024px) {
   .shell {
     display: grid;
     grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
@@ -99,7 +99,7 @@
   }
 }
 
-@media (max-width: 47.9375rem) {
+@media (max-width: 768px) {
   .content {
     padding: 1rem;
   }

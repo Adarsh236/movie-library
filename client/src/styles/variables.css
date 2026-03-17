@@ -40,6 +40,11 @@
 
   --layout-max-width: 90rem;
   --sidebar-width: 18rem;
+
+  /* Breakpoint for reference */
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
 }
 
 :root {
@@ -48,7 +53,7 @@
   --header-height: var(--header-height-mobile);
 }
 
-@media (min-width: 48rem) {
+@media (min-width: 768px) {
   :root {
     --header-height: var(--header-height-desktop);
   }

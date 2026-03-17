@@ -7,6 +7,7 @@ import { Spinner } from '../../../../components/spinner/Spinner'
 import { ErrorState } from '../../../../components/error-state/ErrorState'
 import { EmptyState } from '../../../../components/empty-state/EmptyState'
 import { getApiErrorMessage } from '../../api/api.errors'
+import { useScrollToTopOnResultChange } from '../../../../hooks/useScrollToTopOnResultChange'
 
 type PageContentProps = {
   title: string
@@ -29,6 +30,13 @@ export function PageContent({
   onPageChange,
   emptyState,
 }: PageContentProps) {
+  const resultKey =
+    !isLoading && !isFetching && data
+      ? `${data.page}-${data.totalPages}-${data.items.map((movie) => movie.id).join(',')}`
+      : null
+
+  useScrollToTopOnResultChange(resultKey)
+
   if (isLoading) {
     return (
       <section className={styles.page} aria-busy='true'>

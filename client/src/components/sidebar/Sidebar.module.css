@@ -154,7 +154,7 @@
   transform: translateY(0.0625rem);
 }
 
-@media (min-width: 48rem) {
+@media (min-width: 768px) {
   .sidebar {
     padding: var(--space-5);
   }
@@ -166,7 +166,7 @@
   }
 }
 
-@media (min-width: 64rem) {
+@media (min-width: 1024px) {
   .sidebar {
     gap: var(--space-8);
     padding: var(--space-6);

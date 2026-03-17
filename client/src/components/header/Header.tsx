@@ -8,7 +8,8 @@ type HeaderProps = {
 }
 
 export function Header({ onOpenSidebar }: HeaderProps) {
-  const { searchValue, handleChange, handleSubmit, handleClear } = useHeaderSearch()
+  const { searchValue, handleChange, handleSubmit, handleClear, resetSearchDraft } =
+    useHeaderSearch()
 
   return (
     <div className={styles.header}>
@@ -40,6 +41,7 @@ export function Header({ onOpenSidebar }: HeaderProps) {
       <nav className={styles.end} aria-label='Top navigation'>
         <NavLink
           to='/about'
+          onClick={resetSearchDraft}
           className={({ isActive }) => (isActive ? styles.activeLink : styles.link)}
         >
           About

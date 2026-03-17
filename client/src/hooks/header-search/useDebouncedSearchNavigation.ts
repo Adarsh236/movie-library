@@ -17,6 +17,10 @@ type UseDebouncedSearchNavigationArgs = {
   addSearch: (value: string) => void
 }
 
+function isAutoSearchRoute(pathname: string): boolean {
+  return pathname === '/' || pathname === '/search'
+}
+
 export function useDebouncedSearchNavigation({
   searchValue,
   routeKey,
@@ -28,33 +32,58 @@ export function useDebouncedSearchNavigation({
   addSearch,
 }: UseDebouncedSearchNavigationArgs) {
   const timerRef = useRef<number | null>(null)
+  const latestRouteKeyRef = useRef(routeKey)
+
+  useEffect(() => {
+    latestRouteKeyRef.current = routeKey
+  }, [routeKey])
+
+  useEffect(() => {
+    const normalizedRouteTitle = normalizeSearchTitle(routeTitle)
+
+    if (pathname !== '/search') {
+      return
+    }
+
+    if (normalizedRouteTitle.length < minSearchLength) {
+      return
+    }
+
+    addSearch(normalizedRouteTitle)
+  }, [addSearch, minSearchLength, pathname, routeTitle])
 
   useEffect(() => {
     if (timerRef.current !== null) {
       window.clearTimeout(timerRef.current)
     }
 
-    const capturedRouteKey = routeKey
-    const capturedValue = searchValue
+    if (!isAutoSearchRoute(pathname)) {
+      return
+    }
+
+    const scheduledRouteKey = routeKey
+    const scheduledSearchValue = searchValue
+    const scheduledPathname = pathname
+    const scheduledRouteTitle = routeTitle
 
     timerRef.current = window.setTimeout(() => {
-      const normalizedValue = normalizeSearchTitle(capturedValue)
-
-      if (capturedRouteKey !== routeKey) {
+      if (latestRouteKeyRef.current !== scheduledRouteKey) {
         return
       }
 
+      const normalizedValue = normalizeSearchTitle(scheduledSearchValue)
+
       if (shouldRedirectHome(normalizedValue)) {
-        if (pathname === '/search') {
-          navigate('/', { replace: true })
+        if (scheduledPathname === '/search') {
+          void navigate('/', { replace: true })
         }
         return
       }
 
       if (
         !shouldNavigateToSearch({
-          pathname,
-          routeTitle,
+          pathname: scheduledPathname,
+          routeTitle: scheduledRouteTitle,
           normalizedValue,
           minSearchLength,
         })
@@ -64,14 +93,15 @@ export function useDebouncedSearchNavigation({
 
       addSearch(normalizedValue)
 
-      navigate(buildSearchUrl(normalizedValue), {
-        replace: pathname === '/search',
+      void navigate(buildSearchUrl(normalizedValue), {
+        replace: scheduledPathname === '/search',
       })
     }, debounceMs)
 
     return () => {
       if (timerRef.current !== null) {
         window.clearTimeout(timerRef.current)
+        timerRef.current = null
       }
     }
   }, [

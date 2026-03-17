@@ -57,13 +57,15 @@ export function useHeaderSearch(options: UseHeaderSearchOptions = {}) {
       return
     }
 
-    if (!getValidSearchTitle(normalizedValue)) {
+    const validTitle = getValidSearchTitle(normalizedValue)
+
+    if (!validTitle) {
       return
     }
 
-    addSearch(normalizedValue)
+    addSearch(validTitle)
 
-    void navigate(buildSearchUrl(normalizedValue), {
+    void navigate(buildSearchUrl(validTitle), {
       replace: pathname === '/search',
     })
   }
@@ -73,10 +75,15 @@ export function useHeaderSearch(options: UseHeaderSearchOptions = {}) {
     void navigate('/', { replace: true })
   }
 
+  function resetSearchDraft(): void {
+    setDraftValue('')
+  }
+
   return {
     searchValue,
     handleChange,
     handleSubmit,
     handleClear,
+    resetSearchDraft,
   }
 }
