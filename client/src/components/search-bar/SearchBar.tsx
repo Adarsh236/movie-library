@@ -1,4 +1,4 @@
-import { type SubmitEvent } from 'react'
+import { useRef, type SubmitEventHandler } from 'react'
 import clsx from 'clsx'
 import { Button } from '../button/Button'
 import styles from './SearchBar.module.css'
@@ -25,8 +25,11 @@ export function SearchBar({
   onSubmit,
   onClear,
 }: SearchBarProps) {
-  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+  const inputRef = useRef<HTMLInputElement | null>(null)
+
+  const handleSubmit: SubmitEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault()
+    inputRef.current?.blur()
     onSubmit(value)
   }
 
@@ -40,6 +43,7 @@ export function SearchBar({
 
       <div className={styles.field}>
         <input
+          ref={inputRef}
           id={id}
           name='title'
           type='search'
