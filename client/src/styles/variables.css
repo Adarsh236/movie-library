@@ -49,7 +49,7 @@
 
 :root {
   --header-height-mobile: 7.5rem;
-  --header-height-desktop: 4.5rem;
+  --header-height-desktop: 5rem;
   --header-height: var(--header-height-mobile);
 }
 

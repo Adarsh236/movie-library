@@ -2,7 +2,7 @@ import { NavLink, useSearchParams } from 'react-router-dom'
 import { useGetGenresQuery } from '../../features/movies/api/moviesApi'
 import { buildGenreUrl, buildHomeUrl } from '../../features/movies/lib/movieRouteState'
 import { useRecentSearches } from '../../hooks/useRecentSearches'
-import { useHeaderSearch } from '../..//hooks/header-search/useHeaderSearch'
+import { useHeaderSearch } from '../../hooks/header-search/useHeaderSearch'
 import styles from './Sidebar.module.css'
 import clsx from 'clsx'
 
