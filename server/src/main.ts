@@ -12,7 +12,7 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api')
 
-  const allowedOrigins = (process.env.CLIENT_ORIGIN ?? 'http://localhost:5173')
+  const allowedOrigins = (process.env.CLIENT_ORIGINS ?? 'http://localhost:5173')
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean)
