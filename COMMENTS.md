@@ -213,6 +213,8 @@ For the current scope, the implementation is appropriate. At higher traffic, the
 
 This split fits the stack well. Vercel works naturally for the React frontend and route handling, while Render is a practical option for the NestJS backend and environment-based configuration.
 
+[Note]: The initial delay on first load is mainly caused by the backend being hosted on Render free tier, which spins down after inactivity and needs to cold start before serving the first request.
+
 ---
 
 ## README
